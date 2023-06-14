@@ -48,6 +48,12 @@ class User:
         return result#return the id of the inserted row
     
     @staticmethod
+    def is_email_taken(email):
+        query = "SELECT * FROM users WHERE email = %(email)s;" #define the query
+        result = connectToMySQL('users_schema').query_db(query, {'email': email}) #result will always be a list
+        return len(result) > 0 # True if email is taken, False if not
+    
+    @staticmethod
     def validate_user(user):
         is_valid = True
         if len(user['first_name']) < 3:
@@ -59,7 +65,11 @@ class User:
         if not email_regex.match(user['email']): 
             flash("Invalid email address!")
             is_valid = False
+        if User.is_email_taken(user['email']):
+            flash("Email address already in use!")
+            is_valid = False
         return is_valid
     
+
     
     
